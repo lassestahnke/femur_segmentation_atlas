@@ -1,14 +1,13 @@
 import SimpleITK as sitk
 
-def apply_lin_transf(im_mov, lin_xfm):
+def apply_transf(im_ref, im_mov, xfm):
     """
-    Apply given linear transform `lin_xfm` to `im_mov` and return the transformed image.
+    Apply given transform `xfm` to `im_mov` and return the transformed image.
     """
-    pass
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetReferenceImage(im_ref) # reference image for size, origin and spacing
+    resampler.SetInterpolator(sitk.sitkLinear)
+    resampler.SetDefaultPixelValue(0)
+    resampler.SetTransform(xfm)
+    return resampler.Execute(im_mov)
 
-def apply_nl_transf(im_mov, nl_xfm):
-    """
-    Apply given non-linear transform `nl_xfm` to `im_mov` and return
-    the transformed image.
-    """
-    pass
