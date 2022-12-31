@@ -6,4 +6,4 @@ The project consists of:
  - Registration of atlas images to target image using SITK
     - First linear registration
     - Then non-linear registration
- - Segmenting target image based on the agreement of registered atlas segmentations
+ - Segmenting target image based on the agreement of registered atlas segmentations using majority voting.
