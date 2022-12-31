@@ -1,40 +1,31 @@
 import SimpleITK as sitk
-import numpy as np
 import os
-import matplotlib.pyplot as plt
-from registration import est_lin_transf, est_nl_transf
-from transformation import apply_transf
+from segmentation import seg_atlas
 
-atlas = os.path.join("data", "COMMON_images_masks")
-files = os.listdir(atlas)
-masks = [fil for fil in files if "mask" in fil]
-images = [fil for fil in files if "image" in fil]
+atlas_masks_base = os.path.join("data", "GROUP_masks")
+atlas_images_base = os.path.join("data", "GROUP_images")
 
-# load atlas
-fixed_image = images[0]
-fixed_mask = masks[0]
+files_masks = os.listdir(atlas_masks_base)
+files_images = os.listdir(atlas_images_base)
+atlas_masks = [os.path.join(atlas_masks_base, fil) for fil in files_masks if ".nii" in fil]
+atlas_masks.sort()
+atlas_images = [os.path.join(atlas_images_base, fil) for fil in files_images if ".nii" in fil]
+atlas_images.sort()
 
-atlas_images = images[1:]
-atlas_mask = masks[1:]
+# load image to segment:
+im_base_dir = os.path.join("data", "COMMON_images_masks")
+image = sitk.ReadImage(os.path.join(im_base_dir, "common_40_image.nii.gz"), sitk.sitkFloat32, imageIO="NiftiImageIO")
 
-# read images
-fix_img = sitk.ReadImage(os.path.join(atlas, fixed_image), sitk.sitkFloat32, imageIO="NiftiImageIO")
-moving_img = sitk.ReadImage(os.path.join(atlas, atlas_images[0]), sitk.sitkFloat32, imageIO="NiftiImageIO")
+# segment image using the atlas
+segmentation = seg_atlas(image, atlas_images, atlas_masks)
 
-print("Estimate linear transformation")
-OutTx = est_lin_transf(fix_img, moving_img)
-print("Apply linear transform")
-out = apply_transf(im_ref=fix_img, im_mov=moving_img, xfm=OutTx)
+# load ground truth segmentation
+#gt_seg = sitk.ReadImage(os.path.join(im_base_dir, "common_40_mask.nii.gz"), sitk.sitkFloat32, imageIO="NiftiImageIO")
 
-print("estimate non-linear transformation")
-OutTx_2 = est_nl_transf(fix_img, out)
-print("Apply non-linear images")
-out_2 = apply_transf(im_ref=fix_img, im_mov=out, xfm=OutTx_2)
-
-print("Visualizing registration")
-simg1 = sitk.Cast(sitk.RescaleIntensity(fix_img), sitk.sitkUInt8)
-simg2 = sitk.Cast(sitk.RescaleIntensity(out_2), sitk.sitkUInt8)
+print("Visualizing Segmentation")
+simg1 = sitk.Cast(sitk.RescaleIntensity(image), sitk.sitkUInt8)
+simg2 = sitk.Cast(sitk.RescaleIntensity(segmentation), sitk.sitkUInt8)
 cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-sitk.Show(cimg, "ImageRegistration1 Composition")
+sitk.Show(segmentation, "final segmentation")
 
 print('finished')

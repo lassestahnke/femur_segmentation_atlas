@@ -6,7 +6,7 @@ def apply_transf(im_ref, im_mov, xfm):
     """
     resampler = sitk.ResampleImageFilter()
     resampler.SetReferenceImage(im_ref) # reference image for size, origin and spacing
-    resampler.SetInterpolator(sitk.sitkLinear)
+    resampler.SetInterpolator(sitk.sitkLinear) #todo this might be a problem for labels -> use NN
     resampler.SetDefaultPixelValue(0)
     resampler.SetTransform(xfm)
     return resampler.Execute(im_mov)

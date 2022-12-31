@@ -1,6 +1,6 @@
 """
 This file contains all methods used for estimating the transform for registration of a moving image to a reference
-image. This file was written by https://github.com/lassestahnke and *insert Rebis Github account* with the help of
+image. This file was written by https://github.com/lassestahnke and https://github.com/RebeccaBonato with the help of
 sitk turorials.
 """
 
@@ -45,7 +45,7 @@ def est_lin_transf(im_ref, im_mov):
     R.SetMetricFixedMask(im_ref_mask)
     R.SetInitialTransform(initial_transform, inPlace=False)
     R.SetInterpolator(sitk.sitkLinear)
-    R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
+    #R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
 
     return R.Execute(im_ref, im_mov)
 
@@ -76,7 +76,7 @@ def est_nl_transf(im_ref, im_mov):
     R.SetMetricFixedMask(im_ref_mask)
     R.SetOptimizerAsLBFGSB(
         gradientConvergenceTolerance=1e-5,
-        numberOfIterations=200,
+        numberOfIterations=200, #todo: reset to 200 iterations
         maximumNumberOfCorrections=5,
         maximumNumberOfFunctionEvaluations=1000,
         costFunctionConvergenceFactor=1e7,
@@ -85,7 +85,7 @@ def est_nl_transf(im_ref, im_mov):
     R.SetOptimizerScalesFromPhysicalShift()
     R.SetInitialTransform(tx, inPlace=False)
     R.SetInterpolator(sitk.sitkLinear)
-    R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
+    #R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
 
     return R.Execute(im_ref, im_mov)
 
