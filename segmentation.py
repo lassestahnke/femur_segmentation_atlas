@@ -39,16 +39,17 @@ def seg_atlas(im, atlas_ct_list, atlas_seg_list):
         atlas_segmentations.append(segmentation)
 
         #todo: below are some commands to vidualize intermediate results for debugging
-        #registered_image = apply_transf(im, im_atlas_lin, transf_nl)
+        registered_image = apply_transf(im, im_atlas_lin, transf_nl)
+
         #simg1 = sitk.Cast(sitk.RescaleIntensity(segmentation), sitk.sitkUInt8)
         #simg2 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
         #cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
         #sitk.Show(cimg, "segmentation of ith atlas registered")
 
-        #simg1 = sitk.Cast(sitk.RescaleIntensity(registered_image), sitk.sitkUInt8)
-        #simg2 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
-        #cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-        #sitk.Show(cimg, "registered image of ith atlas")
+        simg1 = sitk.Cast(sitk.RescaleIntensity(registered_image), sitk.sitkUInt8)
+        simg2 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
+        cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
+        sitk.Show(cimg, "registered image of ith atlas")
 
         #simg1 = sitk.Cast(sitk.RescaleIntensity(im_atlas), sitk.sitkUInt8)
         #simg2 = sitk.Cast(sitk.RescaleIntensity(mask_atlas), sitk.sitkUInt8)

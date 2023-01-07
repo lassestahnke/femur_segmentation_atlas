@@ -23,11 +23,11 @@ def est_lin_transf(im_ref, im_mov):
     """
     Estimate linear transform to align `im_mov` to `im_ref` and return the transform parameters.
     """
-    im_ref_mask = im_ref > 250
-    im_ref_mask = sitk.Cast(im_ref_mask, sitk.sitkInt8)
+    im_ref_mask = im_ref > 150
+    im_ref_mask = sitk.Cast(im_ref_mask, sitk.sitkInt16)
 
-    im_mov_mask = im_mov > 250  # only look at strong signals
-    im_mov_mask = sitk.Cast(im_mov_mask, sitk.sitkInt8)
+    im_mov_mask = im_mov > 150  # only look at strong signals
+    im_mov_mask = sitk.Cast(im_mov_mask, sitk.sitkInt16)
 
     initial_transform = sitk.CenteredTransformInitializer(im_ref,
                                                           im_mov,
@@ -38,14 +38,14 @@ def est_lin_transf(im_ref, im_mov):
     # Set methods for registration; Start with Linear
     R = sitk.ImageRegistrationMethod()
     R.SetMetricAsMattesMutualInformation()
-    R.SetOptimizerAsRegularStepGradientDescent(1, 0.01, 300)
+    R.SetOptimizerAsRegularStepGradientDescent(1.2, 0.01, 300)
     R.SetOptimizerScalesFromPhysicalShift()
     R.SetMetricSamplingStrategy(R.NONE)
     R.SetMetricMovingMask(im_mov_mask)
-    R.SetMetricFixedMask(im_ref_mask)
+    #R.SetMetricFixedMask(im_ref_mask)
     R.SetInitialTransform(initial_transform, inPlace=False)
     R.SetInterpolator(sitk.sitkLinear)
-    #R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
+    R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
 
     return R.Execute(im_ref, im_mov)
 
@@ -71,9 +71,9 @@ def est_nl_transf(im_ref, im_mov):
     R = sitk.ImageRegistrationMethod()
     R.SetMetricAsJointHistogramMutualInformation()
     R.SetMetricSamplingStrategy(R.RANDOM)
-    R.SetMetricSamplingPercentage(0.05)
+    R.SetMetricSamplingPercentage(0.01)
     R.SetMetricMovingMask(im_mov_mask)
-    R.SetMetricFixedMask(im_ref_mask)
+    #R.SetMetricFixedMask(im_ref_mask)
     R.SetOptimizerAsLBFGSB(
         gradientConvergenceTolerance=1e-5,
         numberOfIterations=200, #todo: reset to 200 iterations
