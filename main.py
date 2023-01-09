@@ -23,14 +23,12 @@ gt_seg_40 = sitk.ReadImage(os.path.join(im_base_dir, "common_40_mask.nii.gz"), s
 segmentation_40 = seg_atlas(image_40, atlas_images, atlas_masks)
 sitk.WriteImage(segmentation_40, os.path.join(save_base_path, "common_40_image.nii.gz"))
 
-
 # load image 41 to segment:
 image_41 = sitk.ReadImage(os.path.join(im_base_dir, "common_41_image.nii.gz"), sitk.sitkFloat32, imageIO="NiftiImageIO")
 gt_seg_41 = sitk.ReadImage(os.path.join(im_base_dir, "common_41_mask.nii.gz"), sitk.sitkFloat32, imageIO="NiftiImageIO")
 # segment image
 segmentation_41 = seg_atlas(image_41, atlas_images, atlas_masks)
 sitk.WriteImage(segmentation_41, os.path.join(save_base_path, "common_41_image.nii.gz"))
-
 
 # load image 42 to segment:
 image_42 = sitk.ReadImage(os.path.join(im_base_dir, "common_42_image.nii.gz"), sitk.sitkFloat32, imageIO="NiftiImageIO")
@@ -39,7 +37,6 @@ gt_seg_42 = sitk.ReadImage(os.path.join(im_base_dir, "common_42_mask.nii.gz"), s
 segmentation_42 = seg_atlas(image_42, atlas_images, atlas_masks)
 sitk.WriteImage(segmentation_42, os.path.join(save_base_path, "common_42_image.nii.gz"))
 print('finished Registration')
-
 
 print("start of quality asessment")
 # load manually segmented images from Common directory and ground truths
@@ -60,6 +57,7 @@ common41_man = sitk.ReadImage(os.path.join(manual_seg_base_dir, "common_mask", "
 common42_man = sitk.ReadImage(os.path.join(manual_seg_base_dir, "common_mask", "common_42_mask.nii.gz"),
                               sitk.sitkFloat32, imageIO="NiftiImageIO")
 
+# comput metrics
 common40_dice_man = compute_dice(common40_gt, common40_man)
 common40_hd_man = compute_hausdorff(common40_gt, common40_man)
 print("Manual Dice common 40: ", common40_dice_man)
@@ -89,8 +87,8 @@ common42_hd = compute_hausdorff(segmentation_42, common42_gt)
 print("common 42: dice of segmentation", common42_dice, "HD:", common42_hd)
 
 # optional visualization
-#print("Visualizing Segmentation")
-#simg1 = sitk.Cast(sitk.RescaleIntensity(image), sitk.sitkUInt8)
-#simg2 = sitk.Cast(sitk.RescaleIntensity(segmentation), sitk.sitkUInt8)
-#cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-#sitk.Show(cimg, "final segmentation")
+# print("Visualizing Segmentation")
+# simg1 = sitk.Cast(sitk.RescaleIntensity(image), sitk.sitkUInt8)
+# simg2 = sitk.Cast(sitk.RescaleIntensity(segmentation), sitk.sitkUInt8)
+# cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
+# sitk.Show(cimg, "final segmentation")

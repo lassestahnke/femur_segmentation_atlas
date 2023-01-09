@@ -1,7 +1,7 @@
 """
 This file contains all methods used for estimating the transform for registration of a moving image to a reference
 image. This file was written by https://github.com/lassestahnke and https://github.com/RebeccaBonato with the help of
-sitk turorials.
+sitk tutorials.
 """
 
 import SimpleITK as sitk
@@ -19,10 +19,13 @@ def command_iteration(method):
         + f": {method.GetOptimizerPosition()}"
     )
 
-def est_lin_transf(im_ref, im_mov):
 
+def est_lin_transf(im_ref, im_mov):
     """
     Estimate linear transform to align `im_mov` to `im_ref` and return the transform parameters.
+    :param  im_ref: [sitk image] reference image
+            im_mov: [sitk image] moving image
+    return: transformation
     """
     im_ref_mask = im_ref > 150
     im_ref_mask = sitk.Cast(im_ref_mask, sitk.sitkInt16)
@@ -33,32 +36,29 @@ def est_lin_transf(im_ref, im_mov):
     initial_transform = sitk.CenteredTransformInitializer(im_ref_mask,
                                                           im_mov_mask,
                                                           sitk.Similarity3DTransform(),
-                                                          #sitk.TranslationTransform(3),
                                                           sitk.CenteredTransformInitializerFilter.MOMENTS
                                                           )
 
     # Set methods for registration; Start with Linear
     R = sitk.ImageRegistrationMethod()
     R.SetMetricAsMattesMutualInformation()
-    R.SetOptimizerAsRegularStepGradientDescent(1.2, 0.01, 20) # todo set num epochs to 50
+    R.SetOptimizerAsRegularStepGradientDescent(1.2, 0.01, 20)
     R.SetOptimizerScalesFromPhysicalShift()
     R.SetMetricSamplingStrategy(R.NONE)
     R.SetMetricSamplingPercentage(0.10)
-    #R.SetMetricMovingMask(im_mov_mask)
-    #R.SetMetricFixedMask(im_ref_mask)
-    R.SetOptimizerWeights((1, 1, 1, 1, 1, 1, 1))
     R.SetInitialTransform(initial_transform, inPlace=False)
-    #R.SetInitialTransform(sitk.TranslationTransform(3), inPlace=False)
     R.SetInterpolator(sitk.sitkLinear)
     R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
 
     return R.Execute(im_ref, im_mov)
 
 
-
 def est_nl_transf(im_ref, im_mov):
     """
     Estimate non-linear transform to align `im_mov` to `im_ref` and return the transform parameters.
+    :param  im_ref: [sitk image] reference image
+            im_mov: [sitk image] moving image
+    return: transformation
     """
 
     im_ref_mask = im_ref > 150
@@ -84,18 +84,9 @@ def est_nl_transf(im_ref, im_mov):
     R.SetMetricSamplingPercentage(0.01)
     R.SetMetricMovingMask(im_mov_mask)
     R.SetMetricFixedMask(im_ref_mask)
-    #R.SetOptimizerAsLBFGSB(
-    #    gradientConvergenceTolerance=1e-5,
-    #    numberOfIterations=200, #todo: reset to 200 iterations
-    #    maximumNumberOfCorrections=5,
-    #    maximumNumberOfFunctionEvaluations=1000,
-    #    costFunctionConvergenceFactor=1e7,
-    #)
 
-    #R.SetOptimizerScalesFromPhysicalShift()
     R.SetInitialTransform(tx, inPlace=False)
     R.SetInterpolator(sitk.sitkLinear)
-    #R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
+    # R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
 
     return R.Execute(im_ref, im_mov)
-

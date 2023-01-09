@@ -3,6 +3,7 @@ This script provides functions to evaluate segmentation results and compare them
 """
 import SimpleITK as sitk
 
+
 def compute_dice(im1, im2):
     """
     function to compute the dice-score between two images.

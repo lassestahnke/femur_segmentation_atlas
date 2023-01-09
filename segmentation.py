@@ -7,6 +7,10 @@ def seg_atlas(im, atlas_ct_list, atlas_seg_list):
     """
     Apply atlas-based segmentation of `im` using the list of CT images in `atlas_ct_list` and the corresponding
     segmentation masks in `atlas_seg_list`. Return the resulting segmentation mask after majority voting.
+    :param  im: [sitk image] image to segment
+            atlas_ct_list: [List(str)] list of paths to images to incorporate into atlas
+            atlas_seg_list: [List(str)] list of paths to masks to incorporate into atlas
+    :return segmented image
     """
 
     atlas_segmentations = []  # list to store segmentations
@@ -37,26 +41,4 @@ def seg_atlas(im, atlas_ct_list, atlas_seg_list):
         # add to atlas segmenation for majority voting
         atlas_segmentations.append(segmentation)
 
-        # todo: below are some commands to vidualize intermediate results for debugging
-        #registered_image = apply_transf(im, im_atlas_lin, transf_nl)
-
-        # simg1 = sitk.Cast(sitk.RescaleIntensity(segmentation), sitk.sitkUInt8)
-        # simg2 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
-        # cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-        # sitk.Show(cimg, "segmentation of ith atlas registered")
-
-        simg1 = sitk.Cast(sitk.RescaleIntensity(im_atlas_lin), sitk.sitkUInt8)
-        simg2 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
-        cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-        #sitk.Show(cimg, "registered image of ith atlas")
-
-
-        # simg1 = sitk.Cast(sitk.RescaleIntensity(im_atlas), sitk.sitkUInt8)
-        # simg2 = sitk.Cast(sitk.RescaleIntensity(mask_atlas), sitk.sitkUInt8)
-        # cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
-        # sitk.Show(cimg, "atlas image + mask")
-
-        # sitk.Show(mask_atlas, "gt segmentation")
-
-    # return majority voting of mask
     return sitk.LabelVoting(atlas_segmentations)
