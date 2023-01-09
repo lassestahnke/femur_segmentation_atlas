@@ -10,8 +10,11 @@ def compute_dice(im1, im2):
     :param im2: Second image
     :return: dice score
     """
+    im1 = im1 == 2 + im1 == 4
+    im2 = im2 == 2 + im2 == 4
+
     filter = sitk.LabelOverlapMeasuresImageFilter()
-    filter.Execute(im1, im2)
+    filter.Execute(sitk.Cast(im1, sitk.sitkUInt8), sitk.Cast(im2, sitk.sitkUInt8))
 
     return filter.GetDiceCoefficient()
 
@@ -23,8 +26,10 @@ def compute_hausdorff(im1, im2):
     :param im2: label map 2
     :return: hausdorff distance
     """
+    im1 = im1 == 2 + im1 == 4
+    im2 = im2 == 2 + im2 == 4
 
     filter = sitk.HausdorffDistanceImageFilter()
-    filter.Execute(im1, im2)
+    filter.Execute(sitk.Cast(im1, sitk.sitkUInt8), sitk.Cast(im2, sitk.sitkUInt8))
 
     return filter.GetHausdorffDistance()
