@@ -41,4 +41,19 @@ def seg_atlas(im, atlas_ct_list, atlas_seg_list):
         # add to atlas segmenation for majority voting
         atlas_segmentations.append(segmentation)
 
+        # print("Visualizing Segmentation")
+        simg1 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
+        simg2 = sitk.Cast(sitk.RescaleIntensity(im_atlas_lin), sitk.sitkUInt8)
+        cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
+        sitk.Show(cimg, "Linear registration")
+
+        # print("Visualizing Segmentation")
+        im_atlas_nl = apply_transf(im, im_atlas_lin, transf_nl)
+        simg1 = sitk.Cast(sitk.RescaleIntensity(im), sitk.sitkUInt8)
+        simg2 = sitk.Cast(sitk.RescaleIntensity(im_atlas_nl), sitk.sitkUInt8)
+        cimg = sitk.Compose(simg1, simg2, simg1 // 2.0 + simg2 // 2.0)
+        sitk.Show(cimg, "Non Linear registration")
+
+
+
     return sitk.LabelVoting(atlas_segmentations)
